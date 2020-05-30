@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Youtube Player</string>
+    <string name="menu_item_settings">Settings</string>
+    <string name="menu_item_mute">Mute</string>
+    <string name="menu_item_unmute">Unmute</string>
+    <string name="playlist_subtitle">Playlist</string>
+    <string name="dialog_add_video_title">Add Video</string>
+    <string name="add_video_dialog_content">Enter video ID or video link</string>
+    <string name="add_video_accept_button_text">Add</string>
+    <string name="add_video_cancel_button_text">Cancel</string>
+    <string name="add_video_invalid_input_toast">Input is not valid</string>
+    <string name="playlist_video_no_duration">Unknown duration</string>
+    <string name="player_prompt_text">Select Video from Playlist</string>
+    <string name="player_no_next_video_toast">All Videos played</string>
+</resources>

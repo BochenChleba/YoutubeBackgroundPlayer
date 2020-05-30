@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorDarkGrey">
+
+    <TextView
+        android:id="@+id/title_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:layout_marginTop="12dp"
+        android:text="@string/dialog_add_video_title"
+        android:textColor="@color/colorLightWhite"
+        android:textSize="@dimen/dialog_title_size"
+        android:textStyle="bold"
+        android:layout_marginHorizontal="16dp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/content_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add_video_dialog_content"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/dialog_content_text_size"
+        android:gravity="start"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="16dp"
+        app:layout_constraintTop_toBottomOf="@id/title_text_view" />
+
+    <EditText
+        android:id="@+id/video_id_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="start"
+        android:singleLine="true"
+        android:layout_marginHorizontal="14dp"
+        android:textColor="@color/colorLightWhite"
+        android:textSize="@dimen/dialog_content_text_size"
+        app:layout_constraintTop_toBottomOf="@id/content_text_view" />
+
+    <Button
+        android:id="@+id/add_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/add_video_accept_button_text"
+        android:textColor="@color/colorAccent"
+        android:background="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/video_id_edit_text" />
+
+    <Button
+        android:id="@+id/cancel_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:text="@string/add_video_cancel_button_text"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toStartOf="@id/add_button"
+        app:layout_constraintTop_toTopOf="@id/add_button"
+        app:layout_constraintBottom_toBottomOf="@id/add_button"
+ />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

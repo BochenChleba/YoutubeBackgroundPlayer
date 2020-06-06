@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.youtubebackgroundplayer.R
 import com.example.youtubebackgroundplayer.data.database.AppDatabase
-import com.example.youtubebackgroundplayer.data.dto.VideoIdAndOrderDto
 import com.example.youtubebackgroundplayer.ui.player.PlayerFragment
 import com.example.youtubebackgroundplayer.ui.playlist.PlaylistFragment
 import kotlinx.coroutines.Dispatchers
@@ -24,15 +23,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         addVideoFromIntent(intent)
-        //todo play next video
-        //todo recycler item delete / clear all
+        //todo tests, clear playlist recycler
+        //todo recycler clear all, notify single item deleted
         //todo set custom title on video data fetch failure
         //todo youtube API integration
         //todo settings
         //todo mute
         //todo changable order of recycler items
-        //todo timer
         //todo fullscreen mode
+        //todo timer
     }
 
     private fun addVideoFromIntent(intent: Intent?) {
@@ -70,30 +69,30 @@ class MainActivity : AppCompatActivity() {
         super.onAttachFragment(fragment)
         when (fragment) {
             is PlaylistFragment -> {
-                fragment.onVideoSelected = { videoIdAndOrder ->
-                    playVideoInPlayerFragment(videoIdAndOrder)
+                fragment.onVideoSelected = { videoId ->
+                    playVideoInPlayerFragment(videoId)
                 }
             }
             is PlayerFragment -> {
-                fragment.onNextVideoLoaded = { order ->
-                    highlightNextVideoInPlaylistFragment(order)
+                fragment.onVideoFinished = {
+                    playNextVideoFromPlaylist()
                 }
             }
         }
     }
 
-    private fun playVideoInPlayerFragment(videoIdAndOrder: VideoIdAndOrderDto) {
+    private fun playVideoInPlayerFragment(videoId: String) {
         supportFragmentManager
             .findFragmentById(R.id.playerFragment)
             ?.let { it as PlayerFragment }
-            ?.playVideo(videoIdAndOrder)
+            ?.playVideo(videoId)
     }
 
-    private fun highlightNextVideoInPlaylistFragment(videoOrder: Int) {
+    private fun playNextVideoFromPlaylist() {
         supportFragmentManager
             .findFragmentById(R.id.playlistFragment)
             ?.let { it as PlaylistFragment }
-            ?.selectItemInPlaylist(videoOrder)
+            ?.playNextVideo()
     }
 
     override fun onNewIntent(intent: Intent?) {

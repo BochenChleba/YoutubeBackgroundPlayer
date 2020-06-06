@@ -17,24 +17,20 @@ class VideosRepositoryImpl(
                     videoEntity.title,
                     videoEntity.duration?.let { Seconds(it) },
                     videoEntity.isWatched,
-                    videoEntity.videoId,
-                    videoEntity.order
+                    videoEntity.videoId
                 )
             }
 
-    override suspend fun insertVideo(video: VideoDto) {
-        val order = videosDao.count()
-        videosDao.insert(
+    override suspend fun insertVideos(videos: List<VideoDto>) {
+        val entities = videos.map { dto ->
             VideoEntity(
-                title = video.title,
-                duration = video.duration?.seconds,
-                isWatched = video.isWatched,
-                videoId = video.videoId,
-                order = order
+                title = dto.title,
+                duration = dto.duration?.seconds,
+                isWatched = dto.isWatched,
+                videoId = dto.videoId
             )
-        )
+        }
+        videosDao.insertAll(entities)
     }
 
-    override suspend fun getVideoIdByOrder(order: Int) =
-        videosDao.getVideoIdByOrder(order)
 }

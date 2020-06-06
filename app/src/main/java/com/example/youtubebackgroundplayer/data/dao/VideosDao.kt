@@ -15,11 +15,8 @@ interface VideosDao {
     suspend fun getAll(): List<VideoEntity>
 
     @Insert
-    suspend fun insert(video: VideoEntity)
+    suspend fun insertAll(videos: List<VideoEntity>)
 
     @Query("SELECT * FROM videos WHERE id = :id")
     suspend fun getById(id: Int): VideoEntity
-
-    @Query("SELECT videoId FROM videos WHERE `order` = :order")
-    suspend fun getVideoIdByOrder(order: Int): String?
 }

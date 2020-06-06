@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.youtubebackgroundplayer.R
-import com.example.youtubebackgroundplayer.data.dto.FetchedVideoDataDto
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
 import com.example.youtubebackgroundplayer.ext.hideKeyboard
 import com.example.youtubebackgroundplayer.ext.showKeyboard
@@ -68,17 +67,13 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
         viewModel.fetchVideoData(videoId)
     }
 
-    override fun onVideoDataFetched(fetchedVideoDataDto: FetchedVideoDataDto) {
-        viewModel.saveVideo(fetchedVideoDataDto)
+    override fun onVideoDataFetched(videoDto: VideoDto) {
+        videoSavedCallback(videoDto)
+        dismiss()
     }
 
     override fun onVideoDataFetchFailure(videoId: String) {
         // todo show message and request for a title
-    }
-
-    override fun onVideoSaved(videoDto: VideoDto) {
-        videoSavedCallback.invoke(videoDto)
-        dismiss()
     }
 
     override fun onDismiss(dialog: DialogInterface) {

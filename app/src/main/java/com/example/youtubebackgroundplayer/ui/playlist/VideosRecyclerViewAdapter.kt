@@ -9,12 +9,12 @@ import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youtubebackgroundplayer.R
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
+import com.example.youtubebackgroundplayer.data.dto.VideoIdAndPositionDto
 import java.text.SimpleDateFormat
 import java.util.*
 
 class VideosRecyclerViewAdapter(
-    private val onItemClick: (position: Int) -> Unit,
-    private val onDeleteClick: (position: Int) -> Unit
+    private val onItemClick: (videoId: String) -> Unit
 ) : RecyclerView.Adapter<VideosRecyclerViewAdapter.ViewHolder>() {
 
     private val items = mutableListOf<VideoDto>()
@@ -27,41 +27,62 @@ class VideosRecyclerViewAdapter(
             LayoutInflater
                 .from(parent.context)
                 .inflate(R.layout.recycler_item_video, parent, false),
-            onItemClick = { position ->
-                select(position)
-                onItemClick(position)
+            onItemClick = { dto ->
+                val selectedVideoId = select(items.indexOf(dto))
+                onItemClick(selectedVideoId)
             },
-            onDeleteClick = onDeleteClick
+            onDeleteClick = { dto ->
+                removeItem(items.indexOf(dto))
+            }
         )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bindItem(items[position], position, selectedItemIndex)
     }
 
-    fun setItems(items: List<VideoDto>) {
+    fun setItems(itemsToSet: List<VideoDto>) {
      //   this.items.clear()
-        this.items.addAll(items)
+        items.addAll(itemsToSet)
         notifyDataSetChanged()
     }
 
     fun addItem(item: VideoDto) {
-        this.items.add(item)
+        items.add(item)
         notifyItemInserted(this.items.size)
     }
 
-    fun select(position: Int) {
-        val prevSelectedItem = this.selectedItemIndex
-        this.selectedItemIndex = position
+    private fun removeItem(position: Int) {
+        items.removeAt(position)
+        if (selectedItemIndex == position) {
+            selectedItemIndex = null
+        }
+        notifyItemRemoved(position)
+    }
+
+    private fun select(position: Int): String {
+        val prevSelectedItem = selectedItemIndex
+        selectedItemIndex = position
         notifyItemChanged(position)
         if (prevSelectedItem != null) {
             notifyItemChanged(prevSelectedItem)
+        }
+        return items[position].videoId
+    }
+
+    fun selectNextItem(): VideoIdAndPositionDto {
+        val nextItemIndex = selectedItemIndex?.plus(1)
+        return if (nextItemIndex != null && nextItemIndex < items.size) {
+            select(nextItemIndex)
+            VideoIdAndPositionDto(items[nextItemIndex].videoId, nextItemIndex)
+        } else {
+            VideoIdAndPositionDto(null, null)
         }
     }
 
     class ViewHolder(
         itemView: View,
-        private val onItemClick: (position: Int) -> Unit,
-        private val onDeleteClick: (position: Int) -> Unit
+        private val onItemClick: (dto: VideoDto) -> Unit,
+        private val onDeleteClick: (dto: VideoDto) -> Unit
     ) : RecyclerView.ViewHolder(itemView) {
 
         private val durationFormatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
@@ -84,10 +105,10 @@ class VideosRecyclerViewAdapter(
                 titleTextView.setTextColor(context.getColor(R.color.colorWhite))
             }
             deleteImageButton.setOnClickListener {
-                onDeleteClick(position)
+                onDeleteClick(videoDto)
             }
             itemView.setOnClickListener {
-                onItemClick(position)
+                onItemClick(videoDto)
             }
             selectedItemIndex?.let { selectedIndex ->
                 if (position == selectedIndex) {
@@ -95,6 +116,8 @@ class VideosRecyclerViewAdapter(
                 } else {
                     rootLayout.setBackgroundColor(context.getColor(R.color.colorLightBlack))
                 }
+            } ?: run {
+                rootLayout.setBackgroundColor(context.getColor(R.color.colorLightBlack))
             }
         }
     }

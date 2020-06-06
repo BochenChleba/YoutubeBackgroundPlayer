@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.youtubebackgroundplayer.R
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
-import com.example.youtubebackgroundplayer.data.dto.VideoIdAndOrderDto
 import com.example.youtubebackgroundplayer.ui.abstraction.BaseFragment
 import com.example.youtubebackgroundplayer.ui.addvideo.AddVideoDialog
 import kotlinx.android.synthetic.main.fragment_playlist.*
@@ -21,7 +20,7 @@ import org.koin.core.KoinComponent
 class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, PlaylistNavigator {
 
     override val viewModel: PlaylistViewModel by viewModel()
-    lateinit var onVideoSelected: (VideoIdAndOrderDto) -> Unit
+    lateinit var onVideoSelected: (videoId: String) -> Unit
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -44,35 +43,33 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
         }
     }
 
-    override fun onAttachFragment(childFragment: Fragment) {
-        super.onAttachFragment(childFragment)
-        if (childFragment is AddVideoDialog) {
-            childFragment.videoSavedCallback = { videoDto ->
-                adapter.addItem(videoDto)
-                viewModel.addVideoToCachedList(videoDto)
-            }
-        }
-    }
-
-    private val adapter = VideosRecyclerViewAdapter(
-        onItemClick = { position ->
-            viewModel.getVideoIdAndOrderByPosition(position)
-                ?.let { videoIdAndOrder ->
-                    onVideoSelected(videoIdAndOrder)
-                }
-        },
-        onDeleteClick = { position ->
-            toast(position.toString())
-        }
-    )
-
     private fun setRecycler(context: Context) {
         videos_recycler_view.addItemDecoration(DividerItemDecoration(context, LinearLayout.VERTICAL))
         videos_recycler_view.adapter = adapter
     }
 
+    private val adapter = VideosRecyclerViewAdapter(
+        onItemClick = { videoId ->
+            onVideoSelected(videoId)
+        }
+    )
+
+    override fun onAttachFragment(childFragment: Fragment) {
+        super.onAttachFragment(childFragment)
+        if (childFragment is AddVideoDialog) {
+            childFragment.videoSavedCallback = { videoDto ->
+                adapter.addItem(videoDto)
+                videos_recycler_view.smoothScrollToPosition(adapter.itemCount - 1)
+            }
+        }
+    }
+
     override fun onVideoListLoaded(videos: List<VideoDto>) {
         adapter.setItems(videos)
+    }
+
+    override fun onVideoRemoved(position: Int) {
+        TODO("Not yet implemented")
     }
 
     fun showAddVideoFragment(videoId: String) {
@@ -80,7 +77,13 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
             .show(childFragmentManager, AddVideoDialog.TAG)
     }
 
-    fun selectItemInPlaylist(order: Int) {
-        adapter.select(order)
+    fun playNextVideo() {
+        val (nextVideoId, nextVideoPosition) = adapter.selectNextItem()
+        if (nextVideoId != null && nextVideoPosition != null) {
+            onVideoSelected(nextVideoId)
+            videos_recycler_view.smoothScrollToPosition(nextVideoPosition)
+        } else {
+            toast(R.string.player_no_next_video_toast)
+        }
     }
 }

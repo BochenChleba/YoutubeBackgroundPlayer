@@ -2,13 +2,11 @@ package com.example.youtubebackgroundplayer.ui.player
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.example.youtubebackgroundplayer.R
-import com.example.youtubebackgroundplayer.data.dto.VideoIdAndOrderDto
 import com.example.youtubebackgroundplayer.ui.abstraction.BaseFragment
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
@@ -20,8 +18,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class PlayerFragment : BaseFragment<PlayerViewModel>(), PlayerNavigator {
 
     override val viewModel: PlayerViewModel by viewModel()
-    lateinit var onNextVideoLoaded: (order: Int) -> Unit
-    private var currentVideoOrder = -1
+    lateinit var onVideoFinished: () -> Unit
     private var isNextVideoLoading = false
 
     override fun onCreateView(
@@ -69,7 +66,7 @@ class PlayerFragment : BaseFragment<PlayerViewModel>(), PlayerNavigator {
                     PlayerConstants.PlayerState.ENDED -> {
                         if (!isNextVideoLoading) {
                             isNextVideoLoading = true
-                            playNextVideo()
+                            onVideoFinished()
                         }
                     }
                     PlayerConstants.PlayerState.UNSTARTED -> {
@@ -86,25 +83,16 @@ class PlayerFragment : BaseFragment<PlayerViewModel>(), PlayerNavigator {
         })
     }
 
-    private fun playNextVideo() {
-        viewModel.loadNextVideo(currentVideoOrder)
-    }
 
     private fun hidePrompt() {
         youtube_player_view.visibility = View.VISIBLE
         promptTextView.visibility = View.GONE
     }
 
-    override fun onNextVideoIdLoaded(videoIdAndOrder: VideoIdAndOrderDto) {
-        playVideo(videoIdAndOrder)
-        onNextVideoLoaded(videoIdAndOrder.order)
-    }
-
-    fun playVideo(videoIdAndOrder: VideoIdAndOrderDto) {
+    fun playVideo(videoId: String) {
         youtube_player_view.getYouTubePlayerWhenReady(object : YouTubePlayerCallback {
             override fun onYouTubePlayer(youTubePlayer: YouTubePlayer) {
-                youTubePlayer.loadVideo(videoIdAndOrder.videoId, 0f)
-                currentVideoOrder = videoIdAndOrder.order
+                youTubePlayer.loadVideo(videoId, 0f)
             }
         })
     }

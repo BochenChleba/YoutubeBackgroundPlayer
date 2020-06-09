@@ -28,7 +28,7 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
             }
     }
 
-    lateinit var videoSavedCallback: (VideoDto) -> Unit
+    lateinit var onVideoAdded: (VideoDto) -> Unit
     private val viewModel: AddVideoViewModel by viewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -68,7 +68,7 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
     }
 
     override fun onVideoDataFetched(videoDto: VideoDto) {
-        videoSavedCallback(videoDto)
+        onVideoAdded(videoDto)
         dismiss()
     }
 

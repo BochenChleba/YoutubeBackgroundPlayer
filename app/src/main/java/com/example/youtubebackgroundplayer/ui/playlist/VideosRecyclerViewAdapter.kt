@@ -5,20 +5,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youtubebackgroundplayer.R
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
-import com.example.youtubebackgroundplayer.data.dto.VideoIdAndPositionDto
 import java.text.SimpleDateFormat
 import java.util.*
 
 class VideosRecyclerViewAdapter(
-    private val onItemClick: (videoId: String) -> Unit
+    private val onItemClick: (videoId: String, position: Int) -> Unit,
+    private val onDeleteClick: (position: Int) -> Unit
 ) : RecyclerView.Adapter<VideosRecyclerViewAdapter.ViewHolder>() {
 
     private val items = mutableListOf<VideoDto>()
-    private var selectedItemIndex: Int? = null
+    private var selectedItemPosition: Int? = null
 
     override fun getItemCount() = items.size
 
@@ -28,16 +27,19 @@ class VideosRecyclerViewAdapter(
                 .from(parent.context)
                 .inflate(R.layout.recycler_item_video, parent, false),
             onItemClick = { dto ->
-                val selectedVideoId = select(items.indexOf(dto))
-                onItemClick(selectedVideoId)
+                val selectedItemPosition = items.indexOf(dto)
+                select(selectedItemPosition)
+                onItemClick(dto.videoId, selectedItemPosition)
             },
             onDeleteClick = { dto ->
-                removeItem(items.indexOf(dto))
+                val selectedItemPosition = items.indexOf(dto)
+                removeItem(selectedItemPosition)
+                onDeleteClick(selectedItemPosition)
             }
         )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindItem(items[position], position, selectedItemIndex)
+        holder.bindItem(items[position], position, selectedItemPosition)
     }
 
     fun setItems(itemsToSet: List<VideoDto>) {
@@ -52,30 +54,24 @@ class VideosRecyclerViewAdapter(
     }
 
     private fun removeItem(position: Int) {
-        items.removeAt(position)
-        if (selectedItemIndex == position) {
-            selectedItemIndex = null
+        if (selectedItemPosition == position) {
+            selectedItemPosition = null
         }
+        selectedItemPosition?.let { selectedPos ->
+            if (position < selectedPos) {
+                selectedItemPosition = selectedPos - 1
+            }
+        }
+        items.removeAt(position)
         notifyItemRemoved(position)
     }
 
-    private fun select(position: Int): String {
-        val prevSelectedItem = selectedItemIndex
-        selectedItemIndex = position
+    fun select(position: Int) {
+        val prevSelectedItem = selectedItemPosition
+        selectedItemPosition = position
         notifyItemChanged(position)
         if (prevSelectedItem != null) {
             notifyItemChanged(prevSelectedItem)
-        }
-        return items[position].videoId
-    }
-
-    fun selectNextItem(): VideoIdAndPositionDto {
-        val nextItemIndex = selectedItemIndex?.plus(1)
-        return if (nextItemIndex != null && nextItemIndex < items.size) {
-            select(nextItemIndex)
-            VideoIdAndPositionDto(items[nextItemIndex].videoId, nextItemIndex)
-        } else {
-            VideoIdAndPositionDto(null, null)
         }
     }
 

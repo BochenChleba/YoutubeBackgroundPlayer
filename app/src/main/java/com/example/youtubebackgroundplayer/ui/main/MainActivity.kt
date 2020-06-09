@@ -23,8 +23,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         addVideoFromIntent(intent)
-        //todo tests, clear playlist recycler
-        //todo recycler clear all, notify single item deleted
+        //todo save, clear playlist recycler
         //todo set custom title on video data fetch failure
         //todo youtube API integration
         //todo settings

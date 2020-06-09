@@ -49,27 +49,30 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
     }
 
     private val adapter = VideosRecyclerViewAdapter(
-        onItemClick = { videoId ->
+        onItemClick = { videoId, position ->
+            viewModel.currentVideoPosition = position
             onVideoSelected(videoId)
+        },
+        onDeleteClick = { position ->
+            viewModel.removeVideoFromCachedList(position)
         }
     )
 
     override fun onAttachFragment(childFragment: Fragment) {
         super.onAttachFragment(childFragment)
         if (childFragment is AddVideoDialog) {
-            childFragment.videoSavedCallback = { videoDto ->
-                adapter.addItem(videoDto)
-                videos_recycler_view.smoothScrollToPosition(adapter.itemCount - 1)
-            }
+            childFragment.onVideoAdded = { videoDto -> storeNewVideo(videoDto) }
         }
+    }
+
+    private fun storeNewVideo(videoDto: VideoDto) {
+        viewModel.addVideoToCachedList(videoDto)
+        adapter.addItem(videoDto)
+        videos_recycler_view.smoothScrollToPosition(adapter.itemCount - 1)
     }
 
     override fun onVideoListLoaded(videos: List<VideoDto>) {
         adapter.setItems(videos)
-    }
-
-    override fun onVideoRemoved(position: Int) {
-        TODO("Not yet implemented")
     }
 
     fun showAddVideoFragment(videoId: String) {
@@ -78,10 +81,11 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
     }
 
     fun playNextVideo() {
-        val (nextVideoId, nextVideoPosition) = adapter.selectNextItem()
+        val (nextVideoId, nextVideoPosition) = viewModel.getNextVideoIdAndPosition()
         if (nextVideoId != null && nextVideoPosition != null) {
-            onVideoSelected(nextVideoId)
+            adapter.select(nextVideoPosition)
             videos_recycler_view.smoothScrollToPosition(nextVideoPosition)
+            onVideoSelected(nextVideoId)
         } else {
             toast(R.string.player_no_next_video_toast)
         }

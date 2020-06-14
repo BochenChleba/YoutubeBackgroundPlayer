@@ -36,6 +36,18 @@
         />
 
     <ImageButton
+        android:id="@+id/save_button"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_save"
+        app:layout_constraintBottom_toBottomOf="@id/subtitle_text_view"
+        app:layout_constraintDimensionRatio="w,1:1"
+        app:layout_constraintEnd_toStartOf="@id/add_button"
+        app:layout_constraintTop_toTopOf="@id/subtitle_text_view"
+        />
+
+    <ImageButton
         android:id="@+id/clear_button"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -43,7 +55,7 @@
         android:src="@drawable/ic_clear"
         app:layout_constraintBottom_toBottomOf="@id/subtitle_text_view"
         app:layout_constraintDimensionRatio="w,1:1"
-        app:layout_constraintEnd_toStartOf="@id/add_button"
+        app:layout_constraintEnd_toStartOf="@id/save_button"
         app:layout_constraintTop_toTopOf="@id/subtitle_text_view"
         />
 

@@ -39,12 +39,12 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
         viewModel.navigator = this
         setVideoUrl(arguments?.getString(ARG_VIDEO_URL))
         setClickListeners()
-        showKeyboard(video_id_edit_text)
+        showKeyboard(input_edit_text)
     }
 
     private fun setClickListeners() {
         add_button.setOnClickListener {
-            val input = video_id_edit_text.text.toString()
+            val input = input_edit_text.text.toString()
             viewModel.parseInputToVideoId(input)
         }
         cancel_button.setOnClickListener {
@@ -54,7 +54,7 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
 
     private fun setVideoUrl(videoUrl: String?) {
         if (videoUrl != null) {
-            video_id_edit_text.setText(videoUrl)
+            input_edit_text.setText(videoUrl)
         }
     }
 
@@ -63,21 +63,39 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
     }
 
     override fun onVideoIdParsed(videoId: String) {
-        hideKeyboard(video_id_edit_text)
+        add_button.isClickable = false
         viewModel.fetchVideoData(videoId)
     }
 
     override fun onVideoDataFetched(videoDto: VideoDto) {
+        hideKeyboard(input_edit_text)
         onVideoAdded(videoDto)
         dismiss()
     }
 
     override fun onVideoDataFetchFailure(videoId: String) {
-        // todo show message and request for a title
+        input_edit_text.setText("")
+        content_text_view.text = getString(R.string.add_video_enter_title_prompt)
+        toast(getString(R.string.add_video_failute_toast))
+        add_button.setOnClickListener {
+            val title = input_edit_text.text?.toString()
+                .also {
+                    if (it.isNullOrEmpty()) {
+                        toast(getString(R.string.add_video_add_title_toast))
+                        return@setOnClickListener
+                    }
+                }
+            val videoDto = VideoDto(
+                title = title!!,
+                videoId = videoId
+            )
+            onVideoDataFetched(videoDto)
+        }
+        add_button.isClickable = true
     }
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        hideKeyboard(video_id_edit_text)
+        hideKeyboard(input_edit_text)
     }
 }

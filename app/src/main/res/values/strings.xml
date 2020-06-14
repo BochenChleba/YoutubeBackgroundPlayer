@@ -12,4 +12,13 @@
     <string name="playlist_video_no_duration">Unknown duration</string>
     <string name="player_prompt_text">Select Video from Playlist</string>
     <string name="player_no_next_video_toast">All Videos played</string>
+    <string name="playlist_clear_dialog_title">Clear Playlist</string>
+    <string name="playlist_clear_dialog_content">Do you want to clear Playlist ?</string>
+    <string name="playlist_clear_dialog_confirm">Clear</string>
+    <string name="playlist_clear_dialog_cancel">Dismiss</string>
+    <string name="playlist_cleared_toast">Playlist cleared</string>
+    <string name="playlist_saved_toast">Playlist saved</string>
+    <string name="add_video_enter_title_prompt">Enter video title</string>
+    <string name="add_video_add_title_toast">Please enter video title</string>
+    <string name="add_video_failute_toast">Cannot load video data. Please enter the title.</string>
 </resources>

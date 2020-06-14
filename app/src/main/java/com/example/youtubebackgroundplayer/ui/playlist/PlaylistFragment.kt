@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.youtubebackgroundplayer.R
@@ -30,25 +31,50 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
         super.onViewCreated(view, savedInstanceState)
         viewModel.navigator = this
         context?.let { ctx ->
-            setClickListeners()
+            setClickListeners(ctx)
             setRecycler(ctx)
         }
         viewModel.loadVideoList()
     }
 
-    private fun setClickListeners() {
+    private fun setClickListeners(context: Context) {
         add_button.setOnClickListener {
-            AddVideoDialog.newInstance()
-                .show(childFragmentManager, AddVideoDialog.TAG)
+            showAddVideoDialog()
         }
+        clear_button.setOnClickListener {
+            showClearPlaylistDialog(context)
+        }
+        save_button.setOnClickListener {
+            viewModel.savePlaylist()
+        }
+    }
+
+    private fun showAddVideoDialog() {
+        AddVideoDialog.newInstance()
+            .show(childFragmentManager, AddVideoDialog.TAG)
+    }
+
+    private fun showClearPlaylistDialog(context: Context) {
+        AlertDialog.Builder(context)
+            .setTitle(getString(R.string.playlist_clear_dialog_title))
+            .setMessage(getString(R.string.playlist_clear_dialog_content))
+            .setPositiveButton(getString(R.string.playlist_clear_dialog_confirm)) { _, _ ->
+                recyclerAdapter.clearItems()
+                viewModel.clearPlaylist()
+            }
+            .setNegativeButton(getString(R.string.playlist_clear_dialog_cancel)) { dialog, _ ->
+                dialog.cancel()
+            }
+            .create()
+            .show()
     }
 
     private fun setRecycler(context: Context) {
         videos_recycler_view.addItemDecoration(DividerItemDecoration(context, LinearLayout.VERTICAL))
-        videos_recycler_view.adapter = adapter
+        videos_recycler_view.adapter = recyclerAdapter
     }
 
-    private val adapter = VideosRecyclerViewAdapter(
+    private val recyclerAdapter = VideosRecyclerViewAdapter(
         onItemClick = { videoId, position ->
             viewModel.currentVideoPosition = position
             onVideoSelected(videoId)
@@ -61,18 +87,20 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
     override fun onAttachFragment(childFragment: Fragment) {
         super.onAttachFragment(childFragment)
         if (childFragment is AddVideoDialog) {
-            childFragment.onVideoAdded = { videoDto -> storeNewVideo(videoDto) }
+            childFragment.onVideoAdded = { videoDto ->
+                storeNewVideo(videoDto)
+            }
         }
     }
 
     private fun storeNewVideo(videoDto: VideoDto) {
         viewModel.addVideoToCachedList(videoDto)
-        adapter.addItem(videoDto)
-        videos_recycler_view.smoothScrollToPosition(adapter.itemCount - 1)
+        recyclerAdapter.addItem(videoDto)
+        videos_recycler_view.smoothScrollToPosition(recyclerAdapter.itemCount - 1)
     }
 
     override fun onVideoListLoaded(videos: List<VideoDto>) {
-        adapter.setItems(videos)
+        recyclerAdapter.setItems(videos)
     }
 
     fun showAddVideoFragment(videoId: String) {
@@ -83,7 +111,7 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
     fun playNextVideo() {
         val (nextVideoId, nextVideoPosition) = viewModel.getNextVideoIdAndPosition()
         if (nextVideoId != null && nextVideoPosition != null) {
-            adapter.select(nextVideoPosition)
+            recyclerAdapter.select(nextVideoPosition)
             videos_recycler_view.smoothScrollToPosition(nextVideoPosition)
             onVideoSelected(nextVideoId)
         } else {

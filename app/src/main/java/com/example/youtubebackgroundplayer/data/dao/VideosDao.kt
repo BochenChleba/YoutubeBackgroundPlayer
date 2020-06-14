@@ -19,4 +19,7 @@ interface VideosDao {
 
     @Query("SELECT * FROM videos WHERE id = :id")
     suspend fun getById(id: Int): VideoEntity
+
+    @Query("DELETE FROM videos")
+    suspend fun clear()
 }

@@ -8,8 +8,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youtubebackgroundplayer.R
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
-import java.text.SimpleDateFormat
-import java.util.*
 
 class VideosRecyclerViewAdapter(
     private val onItemClick: (videoId: String, position: Int) -> Unit,
@@ -26,15 +24,13 @@ class VideosRecyclerViewAdapter(
             LayoutInflater
                 .from(parent.context)
                 .inflate(R.layout.recycler_item_video, parent, false),
-            onItemClick = { dto ->
-                val selectedItemPosition = items.indexOf(dto)
-                select(selectedItemPosition)
-                onItemClick(dto.videoId, selectedItemPosition)
+            onItemClick = { position ->
+                select(position)
+                onItemClick(items[position].videoId, position)
             },
-            onDeleteClick = { dto ->
-                val selectedItemPosition = items.indexOf(dto)
-                removeItem(selectedItemPosition)
-                onDeleteClick(selectedItemPosition)
+            onDeleteClick = { position ->
+                removeItem(position)
+                onDeleteClick(position)
             }
         )
 
@@ -43,17 +39,16 @@ class VideosRecyclerViewAdapter(
     }
 
     fun setItems(itemsToSet: List<VideoDto>) {
-     //   this.items.clear()
         items.addAll(itemsToSet)
         notifyDataSetChanged()
     }
 
     fun addItem(item: VideoDto) {
         items.add(item)
-        notifyItemInserted(this.items.size)
+        notifyItemInserted(items.size)
     }
 
-    private fun removeItem(position: Int) {
+    fun removeItem(position: Int) {
         if (selectedItemPosition == position) {
             selectedItemPosition = null
         }
@@ -64,6 +59,12 @@ class VideosRecyclerViewAdapter(
         }
         items.removeAt(position)
         notifyItemRemoved(position)
+        notifyItemRangeChanged(position, items.size - position)
+    }
+
+    fun clearItems() {
+        items.clear()
+        notifyDataSetChanged()
     }
 
     fun select(position: Int) {
@@ -77,11 +78,10 @@ class VideosRecyclerViewAdapter(
 
     class ViewHolder(
         itemView: View,
-        private val onItemClick: (dto: VideoDto) -> Unit,
-        private val onDeleteClick: (dto: VideoDto) -> Unit
+        private val onItemClick: (position: Int) -> Unit,
+        private val onDeleteClick: (position: Int) -> Unit
     ) : RecyclerView.ViewHolder(itemView) {
 
-        private val durationFormatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
         private val context = itemView.context
 
         fun bindItem(videoDto: VideoDto, position: Int, selectedItemIndex: Int?) {
@@ -91,7 +91,7 @@ class VideosRecyclerViewAdapter(
             val deleteImageButton = itemView.findViewById<ImageButton>(R.id.delete_image_button)
             titleTextView.text = videoDto.title
             videoDto.duration?.let { duration ->
-                durationTextView.text = durationFormatter.format(Date(duration.millis))
+                durationTextView.text = duration.displayableTime
             } ?: run {
                 durationTextView.text = context.getString(R.string.playlist_video_no_duration)
             }
@@ -101,10 +101,10 @@ class VideosRecyclerViewAdapter(
                 titleTextView.setTextColor(context.getColor(R.color.colorWhite))
             }
             deleteImageButton.setOnClickListener {
-                onDeleteClick(videoDto)
+                onDeleteClick(position)
             }
             itemView.setOnClickListener {
-                onItemClick(videoDto)
+                onItemClick(position)
             }
             selectedItemIndex?.let { selectedIndex ->
                 if (position == selectedIndex) {

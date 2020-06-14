@@ -31,7 +31,7 @@
         app:layout_constraintTop_toBottomOf="@id/title_text_view" />
 
     <EditText
-        android:id="@+id/video_id_edit_text"
+        android:id="@+id/input_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -51,7 +51,7 @@
         android:textColor="@color/colorAccent"
         android:background="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/video_id_edit_text" />
+        app:layout_constraintTop_toBottomOf="@id/input_edit_text" />
 
     <Button
         android:id="@+id/cancel_button"

@@ -1,11 +1,16 @@
 package com.example.youtubebackgroundplayer.ui.addvideo
 
+import androidx.lifecycle.viewModelScope
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
-import com.example.youtubebackgroundplayer.data.repository.VideosRepository
+import com.example.youtubebackgroundplayer.network.YoutubeApiService
 import com.example.youtubebackgroundplayer.ui.abstraction.BaseViewModel
 import com.example.youtubebackgroundplayer.util.parseVideoId
+import kotlinx.coroutines.launch
+import java.net.ConnectException
 
-class AddVideoViewModel: BaseViewModel<AddVideoNavigator>() {
+class AddVideoViewModel(
+    private val youtubeApiService: YoutubeApiService
+): BaseViewModel<AddVideoNavigator>() {
 
     fun parseInputToVideoId(input: String) {
         parseVideoId(input)
@@ -14,13 +19,15 @@ class AddVideoViewModel: BaseViewModel<AddVideoNavigator>() {
     }
 
     fun fetchVideoData(videoId: String) {
-        //todo make api call
-        val result = VideoDto(
-            "tajtle",
-            null,
-            false,
-            videoId
-        )
-        navigator.onVideoDataFetched(result)
+        viewModelScope.launch {
+            try {
+                val response = youtubeApiService.fetchVideoDetails(videoId)
+                val videoDto = VideoDto.fromYoutubeApiResponse(response)
+                navigator.onVideoDataFetched(videoDto)
+            } catch (ex: Throwable) {
+                ex.printStackTrace()
+                navigator.onVideoDataFetchFailure(videoId)
+            }
+        }
     }
 }

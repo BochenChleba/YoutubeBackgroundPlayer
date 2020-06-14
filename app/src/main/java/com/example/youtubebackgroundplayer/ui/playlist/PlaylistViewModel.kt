@@ -1,6 +1,7 @@
 package com.example.youtubebackgroundplayer.ui.playlist
 
 import androidx.lifecycle.viewModelScope
+import com.example.youtubebackgroundplayer.R
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
 import com.example.youtubebackgroundplayer.data.dto.VideoIdAndPositionDto
 import com.example.youtubebackgroundplayer.data.repository.VideosRepository
@@ -29,8 +30,10 @@ class PlaylistViewModel(
 
     fun removeVideoFromCachedList(position: Int) {
         cachedVideosList?.removeAt(position)
-        if (currentVideoPosition!! >= position) {
-            currentVideoPosition = currentVideoPosition?.minus(1)
+        currentVideoPosition?.let { currentPosition ->
+            if (currentPosition >= position) {
+                currentVideoPosition = currentPosition - 1
+            }
         }
     }
 
@@ -44,5 +47,21 @@ class PlaylistViewModel(
             }
         }
         return VideoIdAndPositionDto(nextVideoDto?.videoId, currentVideoPosition)
+    }
+
+    fun clearPlaylist() {
+        viewModelScope.launch {
+            videosRepository.clearAllVideos()
+            navigator.showToast(R.string.playlist_cleared_toast)
+        }
+    }
+
+    fun savePlaylist() {
+        cachedVideosList?.let { videosList ->
+            viewModelScope.launch {
+                videosRepository.setVideos(videosList)
+                navigator.showToast(R.string.playlist_saved_toast)
+            }
+        }
     }
 }

@@ -23,14 +23,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         addVideoFromIntent(intent)
-        //todo save, clear playlist recycler
-        //todo set custom title on video data fetch failure
-        //todo youtube API integration
-        //todo settings
-        //todo mute
+        //todo settings (disconnect BT, auto full screen)
+        //todo BT disconnect
+        //todo change mute to pause/play
         //todo changable order of recycler items
         //todo fullscreen mode
-        //todo timer
+        //todo timer ?
     }
 
     private fun addVideoFromIntent(intent: Intent?) {

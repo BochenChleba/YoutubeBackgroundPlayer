@@ -9,10 +9,12 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.example.youtubebackgroundplayer.R
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
 import com.example.youtubebackgroundplayer.ui.abstraction.BaseFragment
 import com.example.youtubebackgroundplayer.ui.addvideo.AddVideoDialog
+import com.example.youtubebackgroundplayer.util.rv.ItemMoveCallbackListener
 import kotlinx.android.synthetic.main.fragment_playlist.*
 import org.jetbrains.anko.support.v4.toast
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -22,6 +24,8 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
 
     override val viewModel: PlaylistViewModel by viewModel()
     lateinit var onVideoSelected: (videoId: String) -> Unit
+    lateinit var recyclerAdapter: VideosRecyclerViewAdapter
+    lateinit var touchHelper: ItemTouchHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -71,18 +75,26 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
 
     private fun setRecycler(context: Context) {
         videos_recycler_view.addItemDecoration(DividerItemDecoration(context, LinearLayout.VERTICAL))
+        recyclerAdapter = VideosRecyclerViewAdapter(
+            onItemClick = { videoId, position ->
+                viewModel.currentVideoPosition = position
+                onVideoSelected(videoId)
+            },
+            onDeleteClick = { position ->
+                viewModel.removeVideoFromCachedList(position)
+            },
+            onStartDrag = { holder ->
+                touchHelper.startDrag(holder)
+            },
+            onFinishDrag = { items, position ->
+                viewModel.updatePlaylistState(items, position)
+            }
+        )
+        val callback = ItemMoveCallbackListener(recyclerAdapter)
+        touchHelper = ItemTouchHelper(callback)
+        touchHelper.attachToRecyclerView(videos_recycler_view)
         videos_recycler_view.adapter = recyclerAdapter
     }
-
-    private val recyclerAdapter = VideosRecyclerViewAdapter(
-        onItemClick = { videoId, position ->
-            viewModel.currentVideoPosition = position
-            onVideoSelected(videoId)
-        },
-        onDeleteClick = { position ->
-            viewModel.removeVideoFromCachedList(position)
-        }
-    )
 
     override fun onAttachFragment(childFragment: Fragment) {
         super.onAttachFragment(childFragment)

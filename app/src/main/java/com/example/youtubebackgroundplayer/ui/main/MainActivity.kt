@@ -1,9 +1,14 @@
 package com.example.youtubebackgroundplayer.ui.main
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +17,7 @@ import com.example.youtubebackgroundplayer.R
 import com.example.youtubebackgroundplayer.ui.player.PlayerFragment
 import com.example.youtubebackgroundplayer.ui.playlist.PlaylistFragment
 import com.example.youtubebackgroundplayer.ui.settings.SettingsDialog
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,11 +29,24 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        requestBatteryOptimizationDisable()
         addVideoFromIntent(intent)
         setSoundEnabledState()
-        //todo changable order of recycler items
         //todo fullscreen mode
-        //todo timer ?
+    }
+
+    @SuppressLint("BatteryLife")
+    private fun requestBatteryOptimizationDisable() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+            if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
+                val intent = Intent().apply {
+                    action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                    data = Uri.parse("package:$packageName")
+                }
+                startActivity(intent)
+            }
+        }
     }
 
     private fun addVideoFromIntent(intent: Intent?) {

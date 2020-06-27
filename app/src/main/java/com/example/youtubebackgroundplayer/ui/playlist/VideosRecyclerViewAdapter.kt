@@ -1,6 +1,7 @@
 package com.example.youtubebackgroundplayer.ui.playlist
 
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
@@ -8,11 +9,15 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.youtubebackgroundplayer.R
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
+import com.example.youtubebackgroundplayer.util.rv.ItemMoveCallbackListener
+import java.util.*
 
 class VideosRecyclerViewAdapter(
     private val onItemClick: (videoId: String, position: Int) -> Unit,
-    private val onDeleteClick: (position: Int) -> Unit
-) : RecyclerView.Adapter<VideosRecyclerViewAdapter.ViewHolder>() {
+    private val onDeleteClick: (position: Int) -> Unit,
+    private val onStartDrag: (holder: ViewHolder) -> Unit,
+    private val onFinishDrag: (items: List<VideoDto>, selectedItemPosition: Int?) -> Unit
+) : RecyclerView.Adapter<VideosRecyclerViewAdapter.ViewHolder>(), ItemMoveCallbackListener.Listener {
 
     private val items = mutableListOf<VideoDto>()
     private var selectedItemPosition: Int? = null
@@ -36,6 +41,10 @@ class VideosRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bindItem(items[position], position, selectedItemPosition)
+        holder.itemView.setOnLongClickListener {
+            onStartDrag(holder)
+            true
+        }
     }
 
     fun setItems(itemsToSet: List<VideoDto>) {
@@ -75,6 +84,32 @@ class VideosRecyclerViewAdapter(
             notifyItemChanged(prevSelectedItem)
         }
     }
+
+    override fun onRowMoved(fromPosition: Int, toPosition: Int) {
+        if (fromPosition < toPosition) {
+            for (i in fromPosition until toPosition) {
+                Collections.swap(items, i, i + 1)
+            }
+        } else {
+            for (i in fromPosition downTo toPosition + 1) {
+                Collections.swap(items, i, i - 1)
+            }
+        }
+        if (fromPosition == selectedItemPosition) {
+            selectedItemPosition = toPosition
+        } else if (toPosition == selectedItemPosition) {
+            selectedItemPosition = fromPosition
+        }
+
+        notifyItemMoved(fromPosition, toPosition)
+    }
+
+    override fun onRowClear(itemViewHolder: ViewHolder) {
+        notifyDataSetChanged()
+        onFinishDrag(items, selectedItemPosition)
+    }
+
+    override fun onRowSelected(itemViewHolder: ViewHolder) {}
 
     class ViewHolder(
         itemView: View,

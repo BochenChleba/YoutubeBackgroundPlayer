@@ -38,6 +38,11 @@ class PlaylistViewModel(
         }
     }
 
+    fun updatePlaylistState(videos: List<VideoDto>, selectedPosition: Int?) {
+        currentVideoPosition = selectedPosition
+        cachedVideosList = videos.toMutableList()
+    }
+
     fun getNextVideoIdAndPosition(): VideoIdAndPositionDto {
         currentVideoPosition = currentVideoPosition?.plus(1)
         val nextVideoDto = currentVideoPosition?.let { currentPos ->

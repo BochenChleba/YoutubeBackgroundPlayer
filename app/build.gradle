@@ -31,6 +31,9 @@ android {
     kotlinOptions {
         freeCompilerArgs = ["-XXLanguage:+InlineClasses"]
     }
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {

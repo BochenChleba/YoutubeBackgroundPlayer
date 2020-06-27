@@ -1,31 +1,30 @@
 package com.example.youtubebackgroundplayer.ui.main
 
+import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.youtubebackgroundplayer.R
-import com.example.youtubebackgroundplayer.data.database.AppDatabase
 import com.example.youtubebackgroundplayer.ui.player.PlayerFragment
 import com.example.youtubebackgroundplayer.ui.playlist.PlaylistFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.jetbrains.anko.toast
-import org.koin.android.ext.android.get
+import com.example.youtubebackgroundplayer.ui.settings.SettingsDialog
 
 class MainActivity : AppCompatActivity() {
+
+    private val audioManager by lazy {
+        getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    }
+    private var soundEnabled = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         addVideoFromIntent(intent)
-        //todo settings (disconnect BT, auto full screen)
-        //todo BT disconnect
-        //todo change mute to pause/play
+        setSoundEnabledState()
         //todo changable order of recycler items
         //todo fullscreen mode
         //todo timer ?
@@ -40,26 +39,51 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setSoundEnabledState() {
+        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        soundEnabled = currentVolume != 0
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menu ?: return false
         menuInflater.inflate(R.menu.menu_main, menu)
+        setSoundMenuItemDrawable(menu)
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_settings -> {
-                GlobalScope.launch(Dispatchers.IO) {
-                    get<AppDatabase>().clearAllTables()
-                    withContext(Dispatchers.Main) {
-                        toast("data cleared")
-                    }
+    private fun setSoundMenuItemDrawable(menu: Menu) {
+        menu.findItem(R.id.action_mute).icon =
+            getDrawable(
+                if (soundEnabled) {
+                    R.drawable.ic_volume_on
+                } else {
+                    R.drawable.ic_volume_off
                 }
+            )
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean =
+        when (item.itemId) {
+            R.id.action_settings -> {
+                showSettingsDialog()
+                true
+            }
+            R.id.action_mute -> {
+                toggleSoundEnabled()
                 true
             }
             else -> {
                 super.onOptionsItemSelected(item)
             }
         }
+
+    private fun showSettingsDialog() =
+        SettingsDialog.newInstance().show(supportFragmentManager, SettingsDialog.TAG)
+
+    private fun toggleSoundEnabled() {
+        soundEnabled = !soundEnabled
+        audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_TOGGLE_MUTE,0)
+        invalidateOptionsMenu()
     }
 
     override fun onAttachFragment(fragment: Fragment) {

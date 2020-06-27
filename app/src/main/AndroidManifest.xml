@@ -4,6 +4,9 @@
     tools:ignore="LockedOrientationActivity"
     package="com.example.youtubebackgroundplayer" >
 
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <application
         android:name=".ui.MyApplication"
         android:allowBackup="true"

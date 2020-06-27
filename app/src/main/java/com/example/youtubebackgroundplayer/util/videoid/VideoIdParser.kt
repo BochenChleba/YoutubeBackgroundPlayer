@@ -1,4 +1,4 @@
-package com.example.youtubebackgroundplayer.util
+package com.example.youtubebackgroundplayer.util.videoid
 
 private const val YOUTUBE_VIDEO_ID_LENGTH = 11
 private const val YOUTUBE_VIDEO_ID_PREFIX_1 = "youtu.be/"
@@ -10,10 +10,16 @@ fun parseVideoId(input: String): String? =
             input
         }
         input.contains(YOUTUBE_VIDEO_ID_PREFIX_1) -> {
-            getVideoIdFromInput(input, YOUTUBE_VIDEO_ID_PREFIX_1)
+            getVideoIdFromInput(
+                input,
+                YOUTUBE_VIDEO_ID_PREFIX_1
+            )
         }
         input.contains(YOUTUBE_VIDEO_ID_PREFIX_2) -> {
-            getVideoIdFromInput(input, YOUTUBE_VIDEO_ID_PREFIX_2)
+            getVideoIdFromInput(
+                input,
+                YOUTUBE_VIDEO_ID_PREFIX_2
+            )
         }
         else -> {
             null

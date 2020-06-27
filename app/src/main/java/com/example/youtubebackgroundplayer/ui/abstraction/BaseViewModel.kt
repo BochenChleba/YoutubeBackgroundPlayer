@@ -9,5 +9,5 @@ import org.koin.core.inject
 abstract class BaseViewModel<T: BaseNavigator>: ViewModel(), KoinComponent {
     lateinit var navigator: T
     val mapper: ObjectMapper by inject()
-    val prefs: Preferences by inject()
+    val preferences: Preferences by inject()
 }

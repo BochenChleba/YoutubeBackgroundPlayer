@@ -1,5 +1,6 @@
 package com.example.youtubebackgroundplayer.ui.playlist
 
+import android.bluetooth.BluetoothAdapter
 import androidx.lifecycle.viewModelScope
 import com.example.youtubebackgroundplayer.R
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
@@ -62,6 +63,12 @@ class PlaylistViewModel(
                 videosRepository.setVideos(videosList)
                 navigator.showToast(R.string.playlist_saved_toast)
             }
+        }
+    }
+
+    fun optionallyDisconnectBluetooth() {
+        if (preferences.disconnectBluetooth) {
+            BluetoothAdapter.getDefaultAdapter().disable()
         }
     }
 }

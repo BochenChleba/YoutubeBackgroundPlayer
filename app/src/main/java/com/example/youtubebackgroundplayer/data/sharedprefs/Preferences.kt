@@ -1,38 +1,30 @@
 package com.example.youtubebackgroundplayer.data.sharedprefs
 
-import android.content.Context
+import android.content.SharedPreferences
 
-class Preferences(context: Context) {
+private const val KEY_DISCONNECT_BLUETOOTH = "DISCONNECT_BLUETOOTH"
+private const val KEY_FULLSCREEN_ON_ROTATE = "FULLSCREEN_ON_ROTATE"
 
-    companion object {
-        const val UNSET_INT = -1
-        const val UNSET_FLOAT = -1f
-        const val UNSET_LONG = -1L
-        const val UNSET_STRING = ""
+interface Preferences {
+    val sharedPreferences: SharedPreferences
 
-        private const val NAME = "PC_REMOTE_PREFS"
-        private const val KEY_SHUTDOWN_TIME = "shutdownTime"
-        private const val KEY_IP_ADDRESS = "IPAddress"
-    }
-
-    private val sharedPreferences = context.getSharedPreferences(NAME, Context.MODE_PRIVATE)
-
-    fun setShutdownTime(value: Long) {
-        sharedPreferences.edit().also { editor ->
-            editor.putLong(KEY_SHUTDOWN_TIME, value)
-            editor.apply()
+    var disconnectBluetooth: Boolean
+        get() =
+            sharedPreferences.getBoolean(KEY_DISCONNECT_BLUETOOTH, false)
+        set(value) {
+            sharedPreferences.edit().also { editor ->
+                editor.putBoolean(KEY_DISCONNECT_BLUETOOTH, value)
+                editor.apply()
+            }
         }
-    }
 
-    fun clearShutdownTime() {
-        sharedPreferences.edit().also { editor ->
-            editor.remove(KEY_SHUTDOWN_TIME)
-            editor.apply()
+    var fullscreenOnRotate: Boolean
+        get() =
+            sharedPreferences.getBoolean(KEY_FULLSCREEN_ON_ROTATE, false)
+        set(value) {
+            sharedPreferences.edit().also { editor ->
+                editor.putBoolean(KEY_FULLSCREEN_ON_ROTATE, value)
+                editor.apply()
+            }
         }
-    }
-
-    fun getShutdownTime(): Long = sharedPreferences.getLong(
-        KEY_SHUTDOWN_TIME,
-        UNSET_LONG
-    )
 }

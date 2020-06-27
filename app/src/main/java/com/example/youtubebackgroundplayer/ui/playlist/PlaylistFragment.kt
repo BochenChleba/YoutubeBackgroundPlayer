@@ -58,11 +58,11 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
         AlertDialog.Builder(context)
             .setTitle(getString(R.string.playlist_clear_dialog_title))
             .setMessage(getString(R.string.playlist_clear_dialog_content))
-            .setPositiveButton(getString(R.string.playlist_clear_dialog_confirm)) { _, _ ->
+            .setPositiveButton(getString(R.string.clear)) { _, _ ->
                 recyclerAdapter.clearItems()
                 viewModel.clearPlaylist()
             }
-            .setNegativeButton(getString(R.string.playlist_clear_dialog_cancel)) { dialog, _ ->
+            .setNegativeButton(getString(R.string.dismiss)) { dialog, _ ->
                 dialog.cancel()
             }
             .create()
@@ -116,6 +116,7 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
             onVideoSelected(nextVideoId)
         } else {
             toast(R.string.player_no_next_video_toast)
+            viewModel.optionallyDisconnectBluetooth()
         }
     }
 }

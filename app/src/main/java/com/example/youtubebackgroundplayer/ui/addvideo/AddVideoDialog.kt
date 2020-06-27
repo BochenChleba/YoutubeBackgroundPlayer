@@ -5,12 +5,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import com.example.youtubebackgroundplayer.R
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
+import com.example.youtubebackgroundplayer.databinding.DialogAddVideoBinding
+import com.example.youtubebackgroundplayer.databinding.DialogSettingsBinding
 import com.example.youtubebackgroundplayer.ext.hideKeyboard
 import com.example.youtubebackgroundplayer.ext.showKeyboard
 import com.example.youtubebackgroundplayer.ui.abstraction.BaseDialog
 import kotlinx.android.synthetic.main.dialog_add_video.*
+import kotlinx.android.synthetic.main.layout_accept_cancel_buttons.*
 import org.jetbrains.anko.support.v4.toast
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
@@ -32,7 +36,15 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
     private val viewModel: AddVideoViewModel by viewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.dialog_add_video, container)
+    ): View? =
+        DataBindingUtil.inflate<DialogAddVideoBinding>(
+            inflater,
+            R.layout.dialog_add_video,
+            container,
+            false
+        )
+            .also { binding -> binding.lifecycleOwner = this }
+            .root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -43,7 +55,7 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
     }
 
     private fun setClickListeners() {
-        add_button.setOnClickListener {
+        accept_button.setOnClickListener {
             val input = input_edit_text.text.toString()
             viewModel.parseInputToVideoId(input)
         }
@@ -63,7 +75,7 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
     }
 
     override fun onVideoIdParsed(videoId: String) {
-        add_button.isClickable = false
+        accept_button.isClickable = false
         viewModel.fetchVideoData(videoId)
     }
 
@@ -77,7 +89,7 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
         input_edit_text.setText("")
         content_text_view.text = getString(R.string.add_video_enter_title_prompt)
         toast(getString(R.string.add_video_failute_toast))
-        add_button.setOnClickListener {
+        accept_button.setOnClickListener {
             val title = input_edit_text.text?.toString()
                 .also {
                     if (it.isNullOrEmpty()) {
@@ -91,7 +103,7 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
             )
             onVideoDataFetched(videoDto)
         }
-        add_button.isClickable = true
+        accept_button.isClickable = true
     }
 
     override fun onDismiss(dialog: DialogInterface) {

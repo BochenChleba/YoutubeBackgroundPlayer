@@ -4,9 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
 import com.example.youtubebackgroundplayer.network.YoutubeApiService
 import com.example.youtubebackgroundplayer.ui.abstraction.BaseViewModel
-import com.example.youtubebackgroundplayer.util.parseVideoId
+import com.example.youtubebackgroundplayer.util.videoid.parseVideoId
 import kotlinx.coroutines.launch
-import java.net.ConnectException
 
 class AddVideoViewModel(
     private val youtubeApiService: YoutubeApiService

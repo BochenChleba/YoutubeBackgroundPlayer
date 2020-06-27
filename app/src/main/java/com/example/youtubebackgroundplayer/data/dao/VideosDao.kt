@@ -3,7 +3,6 @@ package com.example.youtubebackgroundplayer.data.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.youtubebackgroundplayer.constant.DatabaseConstants.TABLE_NAME_VIDEOS
 import com.example.youtubebackgroundplayer.data.entity.VideoEntity
 
 @Dao

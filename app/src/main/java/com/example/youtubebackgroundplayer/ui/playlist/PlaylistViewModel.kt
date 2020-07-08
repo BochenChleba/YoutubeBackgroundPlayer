@@ -26,8 +26,11 @@ class PlaylistViewModel(
         }
     }
 
-    fun addVideoToCachedList(videoDto: VideoDto) =
+    fun addVideoToCachedList(videoDto: VideoDto) {
         cachedVideosList?.add(videoDto)
+        savePlaylistState()
+    }
+
 
     fun removeVideoFromCachedList(position: Int) {
         cachedVideosList?.removeAt(position)
@@ -36,11 +39,13 @@ class PlaylistViewModel(
                 currentVideoPosition = currentPosition - 1
             }
         }
+        savePlaylistState()
     }
 
     fun updatePlaylistState(videos: List<VideoDto>, selectedPosition: Int?) {
         currentVideoPosition = selectedPosition
         cachedVideosList = videos.toMutableList()
+        savePlaylistState()
     }
 
     fun getNextVideoIdAndPosition(): VideoIdAndPositionDto {
@@ -62,11 +67,10 @@ class PlaylistViewModel(
         }
     }
 
-    fun savePlaylist() {
+    private fun savePlaylistState() {
         cachedVideosList?.let { videosList ->
             viewModelScope.launch {
                 videosRepository.setVideos(videosList)
-                navigator.showToast(R.string.playlist_saved_toast)
             }
         }
     }

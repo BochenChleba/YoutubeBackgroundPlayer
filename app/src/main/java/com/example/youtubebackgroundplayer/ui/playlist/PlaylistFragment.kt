@@ -48,9 +48,6 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
         clear_button.setOnClickListener {
             showClearPlaylistDialog(context)
         }
-        save_button.setOnClickListener {
-            viewModel.savePlaylist()
-        }
     }
 
     private fun showAddVideoDialog() {

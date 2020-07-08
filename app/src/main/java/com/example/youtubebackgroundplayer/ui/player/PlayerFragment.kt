@@ -7,12 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.example.youtubebackgroundplayer.R
+import com.example.youtubebackgroundplayer.ext.player
 import com.example.youtubebackgroundplayer.ui.abstraction.BaseFragment
+import com.example.youtubebackgroundplayer.ui.fullscreen.FullScreenActivity
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerCallback
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
 import kotlinx.android.synthetic.main.fragment_player.*
+import kotlinx.coroutines.CoroutineScope
+import org.jetbrains.anko.support.v4.startActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlayerFragment : BaseFragment<PlayerViewModel>(), PlayerNavigator {
@@ -34,16 +38,18 @@ class PlayerFragment : BaseFragment<PlayerViewModel>(), PlayerNavigator {
     }
 
     private fun setPlayer(context: Context) {
-       // lifecycle.addObserver(youtube_player_view)
         youtube_player_view.enableBackgroundPlayback(true)
 
-        val textView = ImageView(context).apply {
+        val fullscreenImageView = ImageView(context).apply {
             setImageDrawable(context.getDrawable(R.drawable.ic_fullscreen))
             setOnClickListener {
-                //todo start fullscreen activity
+                youtube_player_view.player {
+                    pause()
+                }
+                startActivity<FullScreenActivity>()
             }
         }
-        youtube_player_view.getPlayerUiController().addView(textView)
+        youtube_player_view.getPlayerUiController().addView(fullscreenImageView)
         youtube_player_view.initialize(object :
             YouTubePlayerListener {
             override fun onReady(youTubePlayer: YouTubePlayer) {}
@@ -90,10 +96,8 @@ class PlayerFragment : BaseFragment<PlayerViewModel>(), PlayerNavigator {
     }
 
     fun playVideo(videoId: String) {
-        youtube_player_view.getYouTubePlayerWhenReady(object : YouTubePlayerCallback {
-            override fun onYouTubePlayer(youTubePlayer: YouTubePlayer) {
-                youTubePlayer.loadVideo(videoId, 0f)
-            }
-        })
+        youtube_player_view.player {
+            loadVideo(videoId, 0f)
+        }
     }
 }

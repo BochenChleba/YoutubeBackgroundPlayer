@@ -21,10 +21,10 @@ import com.example.youtubebackgroundplayer.ui.settings.SettingsDialog
 
 class MainActivity : AppCompatActivity() {
 
+    private var soundEnabled = true
     private val audioManager by lazy {
         getSystemService(Context.AUDIO_SERVICE) as AudioManager
     }
-    private var soundEnabled = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

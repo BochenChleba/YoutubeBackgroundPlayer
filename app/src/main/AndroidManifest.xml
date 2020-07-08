@@ -30,6 +30,14 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.fullscreen.FullScreenActivity"
+            android:screenOrientation="landscape"
+            android:launchMode="singleTop"
+            android:theme="@style/FullScreenTheme"
+            >
+        </activity>
+
     </application>
 
 </manifest>

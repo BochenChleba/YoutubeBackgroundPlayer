@@ -1,6 +1,7 @@
 package com.example.youtubebackgroundplayer.ui.main
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
@@ -14,9 +15,17 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.youtubebackgroundplayer.R
+import com.example.youtubebackgroundplayer.constant.BundleConstants
+import com.example.youtubebackgroundplayer.constant.BundleConstants.BUNDLE_CURRENT_VIDEO_SECOND
+import com.example.youtubebackgroundplayer.constant.BundleConstants.BUNDLE_REMAINING_VIDEOS
+import com.example.youtubebackgroundplayer.constant.BundleConstants.REQUEST_CODE_FULLSCREEN
+import com.example.youtubebackgroundplayer.ext.getFragment
+import com.example.youtubebackgroundplayer.ui.fullscreen.FullScreenActivity
 import com.example.youtubebackgroundplayer.ui.player.PlayerFragment
 import com.example.youtubebackgroundplayer.ui.playlist.PlaylistFragment
 import com.example.youtubebackgroundplayer.ui.settings.SettingsDialog
+import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.startActivityForResult
 
 
 class MainActivity : AppCompatActivity() {
@@ -32,7 +41,6 @@ class MainActivity : AppCompatActivity() {
         requestBatteryOptimizationDisable()
         addVideoFromIntent(intent)
         setSoundEnabledState()
-        //todo fullscreen mode
     }
 
     @SuppressLint("BatteryLife")
@@ -53,7 +61,8 @@ class MainActivity : AppCompatActivity() {
         if (intent?.action == Intent.ACTION_SEND) {
             val videoId = intent.extras?.getString(Intent.EXTRA_TEXT)
             if (videoId != null) {
-                showAddVideoDialogInPlaylistFragment(videoId)
+                getFragment<PlaylistFragment>(R.id.playlistFragment)
+                    ?.showAddVideoFragment(videoId)
             }
         }
     }
@@ -109,30 +118,32 @@ class MainActivity : AppCompatActivity() {
         super.onAttachFragment(fragment)
         when (fragment) {
             is PlaylistFragment -> {
-                fragment.onVideoSelected = { videoId ->
-                    playVideoInPlayerFragment(videoId)
+                fragment.onVideoSelected = { videoId, videoSeconds ->
+                    getFragment<PlayerFragment>(R.id.playerFragment)
+                        ?.playVideo(videoId, videoSeconds)
                 }
             }
             is PlayerFragment -> {
                 fragment.onVideoFinished = {
-                    playNextVideoFromPlaylist()
+                    getFragment<PlaylistFragment>(R.id.playlistFragment)
+                        ?.playNextVideo()
+                }
+                fragment.onFullscreenClicked = { currentVideoSecond ->
+                    showFullscreenActivity(currentVideoSecond)
                 }
             }
         }
     }
 
-    private fun playVideoInPlayerFragment(videoId: String) {
-        supportFragmentManager
-            .findFragmentById(R.id.playerFragment)
-            ?.let { it as PlayerFragment }
-            ?.playVideo(videoId)
-    }
-
-    private fun playNextVideoFromPlaylist() {
-        supportFragmentManager
-            .findFragmentById(R.id.playlistFragment)
-            ?.let { it as PlaylistFragment }
-            ?.playNextVideo()
+    private fun showFullscreenActivity(currentVideoSecond: Float) {
+        val remainingVideos = getFragment<PlaylistFragment>(R.id.playlistFragment)
+            ?.getRemainingVideos()
+            ?.toTypedArray()
+        startActivityForResult<FullScreenActivity>(
+            REQUEST_CODE_FULLSCREEN,
+            BUNDLE_CURRENT_VIDEO_SECOND to currentVideoSecond,
+            BUNDLE_REMAINING_VIDEOS to remainingVideos
+        )
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -140,10 +151,20 @@ class MainActivity : AppCompatActivity() {
         addVideoFromIntent(intent)
     }
 
-    private fun showAddVideoDialogInPlaylistFragment(videoUrl: String) {
-        supportFragmentManager
-            .findFragmentById(R.id.playlistFragment)
-            ?.let { it as PlaylistFragment }
-            ?.showAddVideoFragment(videoUrl)
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        getFragment<PlayerFragment>(R.id.playerFragment)
+            ?.showPrompt()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        data ?: return
+        if (requestCode == REQUEST_CODE_FULLSCREEN) {
+            val videoId = data.getStringExtra(BundleConstants.BUNDLE_VIDEO_ID) ?: return
+            val videoSeconds = data.getFloatExtra(BUNDLE_CURRENT_VIDEO_SECOND, 0f)
+            getFragment<PlaylistFragment>(R.id.playlistFragment)
+                ?.selectVideoByVideoId(videoId, videoSeconds)
+        }
     }
 }

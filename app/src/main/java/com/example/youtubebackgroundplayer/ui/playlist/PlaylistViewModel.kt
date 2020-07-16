@@ -6,6 +6,7 @@ import com.example.youtubebackgroundplayer.R
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
 import com.example.youtubebackgroundplayer.data.dto.VideoIdAndPositionDto
 import com.example.youtubebackgroundplayer.data.repository.VideosRepository
+import com.example.youtubebackgroundplayer.ext.minusOneToNull
 import com.example.youtubebackgroundplayer.ui.abstraction.BaseViewModel
 import kotlinx.coroutines.launch
 
@@ -80,4 +81,17 @@ class PlaylistViewModel(
             BluetoothAdapter.getDefaultAdapter().disable()
         }
     }
+
+    fun getRemainingVideos() =
+        cachedVideosList?.let { videosList ->
+            val remainingVideosCount = videosList.size - (currentVideoPosition ?: 0)
+            videosList
+                .takeLast(remainingVideosCount)
+                .map { it.videoId }
+        }
+
+    fun getVideoPositionByVideoId(videoId: String) =
+        cachedVideosList?.let { videoList ->
+            videoList.indexOfFirst { it.videoId == videoId }
+        }?.minusOneToNull()
 }

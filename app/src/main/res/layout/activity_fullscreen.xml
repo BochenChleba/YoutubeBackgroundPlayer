@@ -6,14 +6,13 @@
     android:background="@color/colorLightBlack"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.MainActivity">
+    tools:context=".ui.fullscreen.FullScreenActivity">
 
-    <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
-        android:id="@+id/youtube_player_view"
+    <androidx.fragment.app.FragmentContainerView
+        android:name="com.example.youtubebackgroundplayer.ui.player.PlayerFragment"
+        android:id="@+id/playerFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:autoPlay="false"
-        app:enableAutomaticInitialization="false"
-        app:showFullScreenButton="false" />
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,7 +23,10 @@ class PlayerFragment : BaseFragment<PlayerViewModel>(), PlayerNavigator {
 
     override val viewModel: PlayerViewModel by viewModel()
     lateinit var onVideoFinished: () -> Unit
+    lateinit var onFullscreenClicked: (currentVideoSecond: Float) -> Unit
     private var isNextVideoLoading = false
+    var currentSecond = 0f
+        private set
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -46,7 +49,7 @@ class PlayerFragment : BaseFragment<PlayerViewModel>(), PlayerNavigator {
                 youtube_player_view.player {
                     pause()
                 }
-                startActivity<FullScreenActivity>()
+                onFullscreenClicked(currentSecond)
             }
         }
         youtube_player_view.getPlayerUiController().addView(fullscreenImageView)
@@ -54,7 +57,9 @@ class PlayerFragment : BaseFragment<PlayerViewModel>(), PlayerNavigator {
             YouTubePlayerListener {
             override fun onReady(youTubePlayer: YouTubePlayer) {}
             override fun onApiChange(youTubePlayer: YouTubePlayer) {}
-            override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {}
+            override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
+                currentSecond = second
+            }
             override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {}
             override fun onPlaybackQualityChange(
                 youTubePlayer: YouTubePlayer,
@@ -89,15 +94,25 @@ class PlayerFragment : BaseFragment<PlayerViewModel>(), PlayerNavigator {
         })
     }
 
+    fun showPrompt() {
+        youtube_player_view.visibility = View.INVISIBLE
+        promptTextView.visibility = View.VISIBLE
+    }
 
     private fun hidePrompt() {
         youtube_player_view.visibility = View.VISIBLE
-        promptTextView.visibility = View.GONE
+        promptTextView.visibility = View.INVISIBLE
     }
 
-    fun playVideo(videoId: String) {
+    fun playVideo(videoId: String, startSeconds: Float = 0f) {
         youtube_player_view.player {
-            loadVideo(videoId, 0f)
+            loadVideo(videoId, startSeconds)
+        }
+    }
+
+    fun seekTo(seconds: Float) {
+        youtube_player_view.player {
+            seekTo(seconds)
         }
     }
 }

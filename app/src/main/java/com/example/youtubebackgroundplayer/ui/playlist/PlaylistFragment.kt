@@ -23,7 +23,7 @@ import org.koin.core.KoinComponent
 class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, PlaylistNavigator {
 
     override val viewModel: PlaylistViewModel by viewModel()
-    lateinit var onVideoSelected: (videoId: String) -> Unit
+    lateinit var onVideoSelected: (videoId: String, videoSeconds: Float) -> Unit
     lateinit var recyclerAdapter: VideosRecyclerViewAdapter
     lateinit var touchHelper: ItemTouchHelper
 
@@ -75,7 +75,7 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
         recyclerAdapter = VideosRecyclerViewAdapter(
             onItemClick = { videoId, position ->
                 viewModel.currentVideoPosition = position
-                onVideoSelected(videoId)
+                onVideoSelected(videoId, 0f)
             },
             onDeleteClick = { position ->
                 viewModel.removeVideoFromCachedList(position)
@@ -120,12 +120,24 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
     fun playNextVideo() {
         val (nextVideoId, nextVideoPosition) = viewModel.getNextVideoIdAndPosition()
         if (nextVideoId != null && nextVideoPosition != null) {
-            recyclerAdapter.select(nextVideoPosition)
-            videos_recycler_view.smoothScrollToPosition(nextVideoPosition)
-            onVideoSelected(nextVideoId)
+            selectVideo(nextVideoPosition, nextVideoId)
         } else {
             toast(R.string.player_no_next_video_toast)
             viewModel.optionallyDisconnectBluetooth()
         }
+    }
+
+    private fun selectVideo(position: Int, videoId: String, videoSeconds: Float = 0f) {
+        recyclerAdapter.select(position)
+        videos_recycler_view.smoothScrollToPosition(position)
+        onVideoSelected(videoId, videoSeconds)
+    }
+
+    fun getRemainingVideos() =
+        viewModel.getRemainingVideos()
+
+    fun selectVideoByVideoId(videoId: String, videoSeconds: Float) {
+        val videoPosition = viewModel.getVideoPositionByVideoId(videoId) ?: return
+        selectVideo(videoPosition, videoId, videoSeconds)
     }
 }

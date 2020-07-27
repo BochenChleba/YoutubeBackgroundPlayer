@@ -10,7 +10,7 @@
     <string name="menu_item_unmute">Unmute</string>
     <string name="playlist_subtitle">Playlist</string>
     <string name="dialog_add_video_title">Add Video</string>
-    <string name="add_video_dialog_content">Enter video ID or video link</string>
+    <string name="add_video_dialog_content">Enter video ID, video link or playlist link</string>
     <string name="add_video_invalid_input_toast">Input is not valid</string>
     <string name="playlist_video_no_duration">Unknown duration</string>
     <string name="player_prompt_text">Select Video from Playlist</string>
@@ -21,7 +21,8 @@
     <string name="playlist_saved_toast">Playlist saved</string>
     <string name="add_video_enter_title_prompt">Enter video title</string>
     <string name="add_video_add_title_toast">Please enter video title</string>
-    <string name="add_video_failute_toast">Cannot load video data. Please enter the title.</string>
+    <string name="add_video_failure_toast">Cannot load video data. Please enter the title.</string>
+    <string name="add_playlist_failure_toast">Cannot load playlist data.</string>
     <string name="settings_dialog_title">Settings</string>
     <string name="settings_dialog_disconnect_bluetooth_message">Disconnect Bluetooth audio device after all videos have been played.</string>
     <string name="settings_dialog_fullscreen_on_rotate_message">Automatically enter/exit fullscreen on device rotation.</string>

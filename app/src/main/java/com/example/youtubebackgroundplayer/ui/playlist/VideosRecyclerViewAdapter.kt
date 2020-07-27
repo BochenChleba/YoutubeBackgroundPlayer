@@ -52,9 +52,10 @@ class VideosRecyclerViewAdapter(
         notifyDataSetChanged()
     }
 
-    fun addItem(item: VideoDto) {
-        items.add(item)
-        notifyItemInserted(items.size)
+    fun addItems(itemsToAdd: List<VideoDto>) {
+        val currentSize = items.size
+        items.addAll(itemsToAdd)
+        notifyItemRangeInserted(currentSize, itemsToAdd.size)
     }
 
     fun removeItem(position: Int) {

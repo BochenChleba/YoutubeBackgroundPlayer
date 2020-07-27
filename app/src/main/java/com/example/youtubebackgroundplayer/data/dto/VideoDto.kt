@@ -1,6 +1,7 @@
 package com.example.youtubebackgroundplayer.data.dto
 
-import com.example.youtubebackgroundplayer.data.model.YoutubeApiResponse
+import com.example.youtubebackgroundplayer.data.model.GetPlaylistResponse
+import com.example.youtubebackgroundplayer.data.model.GetVideoDetailsResponse
 import com.example.youtubebackgroundplayer.util.time.Minutes
 import com.example.youtubebackgroundplayer.util.time.Seconds
 
@@ -12,7 +13,17 @@ data class VideoDto(
 ) {
     companion object {
         @Throws(IllegalArgumentException::class)
-        fun fromYoutubeApiResponse(response: YoutubeApiResponse): VideoDto {
+        fun fromGetPlaylistResponse(response: GetPlaylistResponse): List<VideoDto> =
+            response.items.map { responseItem ->
+                VideoDto(
+                    title = responseItem.snippet?.title
+                        ?: throw IllegalArgumentException(),
+                    videoId = responseItem.snippet.resourceId.videoId
+                )
+            }
+
+        @Throws(IllegalArgumentException::class)
+        fun fromGetVideoDetailsResponse(response: GetVideoDetailsResponse): VideoDto {
             val videoItem = response.items?.firstOrNull()
                 ?: throw IllegalArgumentException()
             return VideoDto(

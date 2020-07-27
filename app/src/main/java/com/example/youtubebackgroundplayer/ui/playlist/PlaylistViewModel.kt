@@ -23,15 +23,14 @@ class PlaylistViewModel(
                 val videosList = videosRepository.getVideosList()
                 cachedVideosList = videosList.toMutableList()
             }
-            navigator.onVideoListLoaded(cachedVideosList ?: emptyList())
+            getNavigator().onVideoListLoaded(cachedVideosList ?: emptyList())
         }
     }
 
-    fun addVideoToCachedList(videoDto: VideoDto) {
-        cachedVideosList?.add(videoDto)
+    fun addVideosToCachedList(videoDtoList: List<VideoDto>) {
+        cachedVideosList?.addAll(videoDtoList)
         savePlaylistState()
     }
-
 
     fun removeVideoFromCachedList(position: Int) {
         cachedVideosList?.removeAt(position)
@@ -63,8 +62,9 @@ class PlaylistViewModel(
 
     fun clearPlaylist() {
         viewModelScope.launch {
+            cachedVideosList?.clear()
             videosRepository.clearAllVideos()
-            navigator.showToast(R.string.playlist_cleared_toast)
+            getNavigator().showToast(R.string.playlist_cleared_toast)
         }
     }
 

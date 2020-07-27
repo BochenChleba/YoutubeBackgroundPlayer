@@ -5,7 +5,9 @@ import com.example.youtubebackgroundplayer.ui.abstraction.BaseNavigator
 
 interface AddVideoNavigator: BaseNavigator {
     fun onInvalidInput()
-    fun onVideoIdParsed(videoId: String)
-    fun onVideoDataFetched(videoDto: VideoDto)
+    fun onInputParsed()
+    fun onVideoDataFetched(videoDtoList: List<VideoDto>)
     fun onVideoDataFetchFailure(videoId: String)
+    fun onPlaylistFetchFailure()
+    fun onDataFetchFinished()
 }

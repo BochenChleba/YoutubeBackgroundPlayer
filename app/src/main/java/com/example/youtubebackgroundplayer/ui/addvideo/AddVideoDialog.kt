@@ -9,7 +9,6 @@ import androidx.databinding.DataBindingUtil
 import com.example.youtubebackgroundplayer.R
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
 import com.example.youtubebackgroundplayer.databinding.DialogAddVideoBinding
-import com.example.youtubebackgroundplayer.databinding.DialogSettingsBinding
 import com.example.youtubebackgroundplayer.ext.hideKeyboard
 import com.example.youtubebackgroundplayer.ext.showKeyboard
 import com.example.youtubebackgroundplayer.ui.abstraction.BaseDialog
@@ -32,7 +31,7 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
             }
     }
 
-    lateinit var onVideoAdded: (VideoDto) -> Unit
+    lateinit var onVideosAdded: (List<VideoDto>) -> Unit
     private val viewModel: AddVideoViewModel by viewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -48,7 +47,7 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.navigator = this
+        viewModel.setNavigator(this)
         setVideoUrl(arguments?.getString(ARG_VIDEO_URL))
         setClickListeners()
         showKeyboard(input_edit_text)
@@ -57,7 +56,7 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
     private fun setClickListeners() {
         accept_button.setOnClickListener {
             val input = input_edit_text.text.toString()
-            viewModel.parseInputToVideoId(input)
+            viewModel.parseInputAndFetchData(input)
         }
         cancel_button.setOnClickListener {
             dismiss()
@@ -74,21 +73,21 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
         toast(getString(R.string.add_video_invalid_input_toast))
     }
 
-    override fun onVideoIdParsed(videoId: String) {
+    override fun onInputParsed() {
         accept_button.isClickable = false
-        viewModel.fetchVideoData(videoId)
+        //todo progressbar
     }
 
-    override fun onVideoDataFetched(videoDto: VideoDto) {
+    override fun onVideoDataFetched(videoDtoList: List<VideoDto>) {
         hideKeyboard(input_edit_text)
-        onVideoAdded(videoDto)
+        onVideosAdded(videoDtoList)
         dismiss()
     }
 
     override fun onVideoDataFetchFailure(videoId: String) {
         input_edit_text.setText("")
         content_text_view.text = getString(R.string.add_video_enter_title_prompt)
-        toast(getString(R.string.add_video_failute_toast))
+        toast(getString(R.string.add_video_failure_toast))
         accept_button.setOnClickListener {
             val title = input_edit_text.text?.toString()
                 .also {
@@ -101,9 +100,18 @@ class AddVideoDialog : BaseDialog(), KoinComponent, AddVideoNavigator {
                 title = title!!,
                 videoId = videoId
             )
-            onVideoDataFetched(videoDto)
+            onVideoDataFetched(listOf(videoDto))
         }
+    }
+
+    override fun onPlaylistFetchFailure() {
+        toast(getString(R.string.add_playlist_failure_toast))
+        //todo remove and use showToast
+    }
+
+    override fun onDataFetchFinished() {
         accept_button.isClickable = true
+        //todo progressbar
     }
 
     override fun onDismiss(dialog: DialogInterface) {

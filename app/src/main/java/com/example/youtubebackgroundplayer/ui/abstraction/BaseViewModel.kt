@@ -5,9 +5,17 @@ import com.example.youtubebackgroundplayer.data.sharedprefs.Preferences
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.lang.ref.WeakReference
 
 abstract class BaseViewModel<T: BaseNavigator>: ViewModel(), KoinComponent {
-    lateinit var navigator: T
     val mapper: ObjectMapper by inject()
     val preferences: Preferences by inject()
+    private lateinit var navigator: WeakReference<T>
+
+    protected fun getNavigator() =
+        navigator.get() ?: throw IllegalStateException()
+
+    fun setNavigator(nav: T) {
+        this.navigator = WeakReference(nav)
+    }
 }

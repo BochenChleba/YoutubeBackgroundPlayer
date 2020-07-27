@@ -34,7 +34,7 @@ class PlayerFragment : BaseFragment<PlayerViewModel>(), PlayerNavigator {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.navigator = this
+        viewModel.setNavigator(this)
         context?.let { ctx ->
             setPlayer(ctx)
         }

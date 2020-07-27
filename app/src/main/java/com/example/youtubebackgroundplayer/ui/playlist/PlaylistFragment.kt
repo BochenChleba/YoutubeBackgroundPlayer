@@ -33,7 +33,7 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.navigator = this
+        viewModel.setNavigator(this)
         context?.let { ctx ->
             setClickListeners(ctx)
             setRecycler(ctx)
@@ -96,15 +96,15 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
     override fun onAttachFragment(childFragment: Fragment) {
         super.onAttachFragment(childFragment)
         if (childFragment is AddVideoDialog) {
-            childFragment.onVideoAdded = { videoDto ->
-                storeNewVideo(videoDto)
+            childFragment.onVideosAdded = { videoDtoList ->
+                storeNewVideo(videoDtoList)
             }
         }
     }
 
-    private fun storeNewVideo(videoDto: VideoDto) {
-        viewModel.addVideoToCachedList(videoDto)
-        recyclerAdapter.addItem(videoDto)
+    private fun storeNewVideo(videoDtoList: List<VideoDto>) {
+        viewModel.addVideosToCachedList(videoDtoList)
+        recyclerAdapter.addItems(videoDtoList)
         videos_recycler_view.smoothScrollToPosition(recyclerAdapter.itemCount - 1)
     }
 

@@ -43,7 +43,7 @@ class SettingsDialog : BaseDialog(), KoinComponent, SettingsNavigator {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.navigator = this
+        viewModel.setNavigator(this)
         context ?: return
         loadSettings()
         setOnClickListeners()

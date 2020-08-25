@@ -18,25 +18,25 @@ class AddVideoViewModel(
     fun parseInputAndFetchData(input: String) =
         when {
             input.length == YOUTUBE_VIDEO_ID_LENGTH -> {
-                getNavigator().onInputParsed()
+                navigator.onInputParsed()
             }
             input.contains(YOUTUBE_VIDEO_ID_PREFIX_1) -> {
                 val videoId = getVideoIdFromInput(input, YOUTUBE_VIDEO_ID_PREFIX_1)
-                getNavigator().onInputParsed()
+                navigator.onInputParsed()
                 fetchVideoData(videoId)
             }
             input.contains(YOUTUBE_VIDEO_ID_PREFIX_2) -> {
                 val videoId = getVideoIdFromInput(input, YOUTUBE_VIDEO_ID_PREFIX_2)
-                getNavigator().onInputParsed()
+                navigator.onInputParsed()
                 fetchVideoData(videoId)
             }
             input.contains(YOUTUBE_PLAYLIST_PREFIX) -> {
                 val playlistId = getPlaylistIdFromInput(input)
-                getNavigator().onInputParsed()
+                navigator.onInputParsed()
                 fetchPlaylistData(playlistId)
             }
             else -> {
-                getNavigator().onInvalidInput()
+                navigator.onInvalidInput()
             }
         }
 
@@ -52,12 +52,12 @@ class AddVideoViewModel(
             try {
                 val response = youtubeApiService.fetchVideoDetails(videoId)
                 val videoDto = VideoDto.fromGetVideoDetailsResponse(response)
-                getNavigator().onVideoDataFetched(listOf(videoDto))
+                navigator.onVideoDataFetched(listOf(videoDto))
             } catch (ex: Throwable) {
                 ex.printStackTrace()
-                getNavigator().onVideoDataFetchFailure(videoId)
+                navigator.onVideoDataFetchFailure(videoId)
             } finally {
-                getNavigator().onDataFetchFinished()
+                navigator.onDataFetchFinished()
             }
         }
     }
@@ -67,12 +67,12 @@ class AddVideoViewModel(
             try {
                 val response = youtubeApiService.fetchPlaylist(playlistId)
                 val videoDtoList = VideoDto.fromGetPlaylistResponse(response)
-                getNavigator().onVideoDataFetched(videoDtoList)
+                navigator.onVideoDataFetched(videoDtoList)
             } catch (ex: Throwable) {
                 ex.printStackTrace()
-                getNavigator().onPlaylistFetchFailure()
+                navigator.onPlaylistFetchFailure()
             } finally {
-                getNavigator().onDataFetchFinished()
+                navigator.onDataFetchFinished()
             }
         }
     }

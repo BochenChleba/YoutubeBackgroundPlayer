@@ -26,4 +26,7 @@
     <string name="settings_dialog_title">Settings</string>
     <string name="settings_dialog_disconnect_bluetooth_message">Disconnect Bluetooth audio device after all videos have been played.</string>
     <string name="settings_dialog_fullscreen_on_rotate_message">Automatically enter/exit fullscreen on device rotation.</string>
+    <string name="play_in_background_button_text">Play in background</string>
+    <string name="play_in_background_notification_text">Video is playing in background</string>
+    <string name="play_in_background_no_videos_toast">No videos to play</string>
 </resources>

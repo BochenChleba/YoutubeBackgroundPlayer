@@ -6,14 +6,8 @@
     android:layout_height="wrap_content"
     android:background="@color/colorBlack">
 
-    <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
-        android:id="@+id/youtube_player_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="invisible"
-        app:autoPlay="false"
-        app:enableAutomaticInitialization="false"
-        app:showFullScreenButton="false" />
+    <include
+        layout="@layout/view_youtube_player" />
 
     <TextView
         android:id="@+id/promptTextView"

@@ -10,12 +10,12 @@ import java.lang.ref.WeakReference
 abstract class BaseViewModel<T: BaseNavigator>: ViewModel(), KoinComponent {
     val mapper: ObjectMapper by inject()
     val preferences: Preferences by inject()
-    private lateinit var navigator: WeakReference<T>
+    private lateinit var navigatorReference: WeakReference<T>
 
-    protected fun getNavigator() =
-        navigator.get() ?: throw IllegalStateException()
+    protected val navigator: T
+        get() = navigatorReference.get() ?: throw IllegalStateException()
 
     fun setNavigator(nav: T) {
-        this.navigator = WeakReference(nav)
+        this.navigatorReference = WeakReference(nav)
     }
 }

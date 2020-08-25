@@ -8,11 +8,10 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.youtubebackgroundplayer.R
-import com.example.youtubebackgroundplayer.constant.BundleConstants.BUNDLE_CURRENT_VIDEO_SECOND
+import com.example.youtubebackgroundplayer.constant.BundleConstants.BUNDLE_TIME_ELAPSED
 import com.example.youtubebackgroundplayer.constant.BundleConstants.BUNDLE_REMAINING_VIDEOS
 import com.example.youtubebackgroundplayer.constant.BundleConstants.BUNDLE_VIDEO_ID
 import com.example.youtubebackgroundplayer.ext.getFragment
-import com.example.youtubebackgroundplayer.ext.player
 import com.example.youtubebackgroundplayer.ui.player.PlayerFragment
 
 class FullScreenActivity : AppCompatActivity() {
@@ -24,7 +23,6 @@ class FullScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         goFullScreen()
         setContentView(R.layout.activity_fullscreen)
-
     }
 
     private fun goFullScreen() {
@@ -34,12 +32,12 @@ class FullScreenActivity : AppCompatActivity() {
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        getBundleData()
+        getExtras()
     }
 
-    private fun getBundleData() {
+    private fun getExtras() {
         videosToPlay = intent.extras?.getStringArray(BUNDLE_REMAINING_VIDEOS) ?: return
-        val currentVideoSecond = intent.extras?.getFloat(BUNDLE_CURRENT_VIDEO_SECOND) ?: 0f
+        val currentVideoSecond = intent.extras?.getFloat(BUNDLE_TIME_ELAPSED) ?: 0f
         if (videosToPlay.isNotEmpty()) {
             playNextVideoInFragment(currentVideoSecond)
         }
@@ -73,7 +71,7 @@ class FullScreenActivity : AppCompatActivity() {
         val currentSecond = getFragment<PlayerFragment>(R.id.playerFragment)?.currentSecond
         val currentVideoId = videosToPlay[currentVideoPosition]
         val intent = Intent().apply {
-            putExtra(BUNDLE_CURRENT_VIDEO_SECOND, currentSecond)
+            putExtra(BUNDLE_TIME_ELAPSED, currentSecond)
             putExtra(BUNDLE_VIDEO_ID, currentVideoId)
         }
         setResult(Activity.RESULT_OK, intent)

@@ -15,6 +15,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerCallback
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
 import kotlinx.android.synthetic.main.fragment_player.*
+import kotlinx.android.synthetic.main.view_youtube_player.*
 import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.anko.support.v4.startActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -41,8 +42,6 @@ class PlayerFragment : BaseFragment<PlayerViewModel>(), PlayerNavigator {
     }
 
     private fun setPlayer(context: Context) {
-        youtube_player_view.enableBackgroundPlayback(true)
-
         val fullscreenImageView = ImageView(context).apply {
             setImageDrawable(context.getDrawable(R.drawable.ic_fullscreen))
             setOnClickListener {

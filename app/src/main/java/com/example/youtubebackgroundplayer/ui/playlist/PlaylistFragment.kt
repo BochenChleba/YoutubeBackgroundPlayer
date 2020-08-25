@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.example.youtubebackgroundplayer.R
 import com.example.youtubebackgroundplayer.data.dto.VideoDto
+import com.example.youtubebackgroundplayer.data.dto.VideoIdAndTimeElapsedDto
 import com.example.youtubebackgroundplayer.ui.abstraction.BaseFragment
 import com.example.youtubebackgroundplayer.ui.addvideo.AddVideoDialog
 import com.example.youtubebackgroundplayer.util.rv.ItemMoveCallbackListener
@@ -26,6 +27,7 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
     lateinit var onVideoSelected: (videoId: String, videoSeconds: Float) -> Unit
     lateinit var recyclerAdapter: VideosRecyclerViewAdapter
     lateinit var touchHelper: ItemTouchHelper
+    private var cachedVideoIdAndTimeElapsedDto: VideoIdAndTimeElapsedDto? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -110,6 +112,9 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
 
     override fun onVideoListLoaded(videos: List<VideoDto>) {
         recyclerAdapter.setItems(videos)
+        cachedVideoIdAndTimeElapsedDto?.let {
+            selectVideoByVideoId(it)
+        }
     }
 
     fun showAddVideoFragment(videoId: String) {
@@ -128,6 +133,7 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
     }
 
     private fun selectVideo(position: Int, videoId: String, videoSeconds: Float = 0f) {
+        viewModel.currentVideoPosition = position
         recyclerAdapter.select(position)
         videos_recycler_view.smoothScrollToPosition(position)
         onVideoSelected(videoId, videoSeconds)
@@ -136,8 +142,17 @@ class PlaylistFragment: BaseFragment<PlaylistViewModel>(), KoinComponent, Playli
     fun getRemainingVideos() =
         viewModel.getRemainingVideos()
 
-    fun selectVideoByVideoId(videoId: String, videoSeconds: Float) {
-        val videoPosition = viewModel.getVideoPositionByVideoId(videoId) ?: return
-        selectVideo(videoPosition, videoId, videoSeconds)
+    fun selectVideoByVideoId(videoIdAndTimeElapsedDto: VideoIdAndTimeElapsedDto) {
+        val videoPosition = viewModel.getVideoPositionByVideoId(videoIdAndTimeElapsedDto.videoId)
+        if (videoPosition == null) {
+            cachedVideoIdAndTimeElapsedDto = videoIdAndTimeElapsedDto
+        } else {
+            selectVideo(
+                videoPosition,
+                videoIdAndTimeElapsedDto.videoId,
+                videoIdAndTimeElapsedDto.timeElapsed
+            )
+        }
+
     }
 }

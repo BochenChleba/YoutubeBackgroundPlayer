@@ -23,7 +23,7 @@ class PlaylistViewModel(
                 val videosList = videosRepository.getVideosList()
                 cachedVideosList = videosList.toMutableList()
             }
-            getNavigator().onVideoListLoaded(cachedVideosList ?: emptyList())
+            navigator.onVideoListLoaded(cachedVideosList ?: emptyList())
         }
     }
 
@@ -64,7 +64,7 @@ class PlaylistViewModel(
         viewModelScope.launch {
             cachedVideosList?.clear()
             videosRepository.clearAllVideos()
-            getNavigator().showToast(R.string.playlist_cleared_toast)
+            navigator.showToast(R.string.playlist_cleared_toast)
         }
     }
 

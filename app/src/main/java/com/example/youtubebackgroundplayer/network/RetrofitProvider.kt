@@ -1,5 +1,6 @@
 package com.example.youtubebackgroundplayer.network
 
+import com.example.youtubebackgroundplayer.constant.NetworkConstants
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
